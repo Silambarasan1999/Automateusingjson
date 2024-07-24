@@ -1,0 +1,51 @@
+{
+  "version": "0.2",
+  "env": {
+    "variables": {
+      "AWS_DEFAULT_REGION": "us-east-1"
+    }
+  },
+  "phases": {
+    "install": {
+      "runtime-versions": {
+        "nodejs": "20"
+      },
+      "commands": [
+        "echo \"Checking AWS CLI version...\"",
+        "aws --version",
+        "echo \"Listing directory contents...\"",
+        "ls -al",
+        "echo \"Installing zip utility...\"",
+        "if command -v yum >/dev/null 2>&1; then yum install -y zip; elif command -v apt-get >/dev/null 2>&1; then apt-get update && apt-get install -y zip; else echo \"No supported package manager found. Install zip manually.\"; fi"
+      ]
+    },
+    "build": {
+      "commands": [
+        "echo \"Creating zip file...\"",
+        "zip -r code.zip . || exit 1",
+        "echo \"Verifying zip file...\"",
+        "ls -al code.zip"
+      ]
+    },
+    "post_build": {
+      "commands": [
+        "echo \"Updating Lambda function...\"",
+        "aws lambda update-function-code --function-name demo --zip-file fileb://code.zip > update-output.log 2>&1",
+        "if [ $? -ne 0 ]; then echo \"Update function code failed\"; cat update-output.log; exit 1; fi",
+        "echo \"Publishing new Lambda version...\"",
+        "echo \"Current AWS configuration:\"",
+        "aws configure list",
+        "aws sts get-caller-identity",
+        "aws lambda publish-version --function-name demo --description \"Automated version update\" > publish-output.log 2>&1",
+        "if [ $? -ne 0 ]; then echo \"Publish version failed\"; cat publish-output.log; exit 1; fi"
+      ]
+    }
+  },
+  "artifacts": {
+    "files": [
+      "code.zip",
+      "update-output.log",
+      "publish-output.log"
+    ]
+  }
+}

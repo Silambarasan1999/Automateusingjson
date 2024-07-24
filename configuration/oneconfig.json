@@ -2,10 +2,8 @@
   "version": "0.2",
   "env": {
     "variables": {
-      "AWS_DEFAULT_REGION": 'us-east-1'
-      // Consider using environment variables set in the CodeBuild project settings for credentials
-      // "AWS_ACCESS_KEY_ID": "<Your AWS Access Key ID>",
-      // "AWS_SECRET_ACCESS_KEY": "<Your AWS Secret Access Key>"
+      "AWS_DEFAULT_REGION": "us-east-1"
+  
     }
   },
   "phases": {

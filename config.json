@@ -21,6 +21,9 @@
     },
     "build": {
       "commands": [
+        "echo \"Fetching latest commit message...\"",
+        "LATEST_COMMIT_MESSAGE=$(git log -1 --pretty=%B)",
+        "echo \"Latest commit message: $LATEST_COMMIT_MESSAGE\"",
         "echo \"Creating zip file...\"",
         "zip -r code.zip . || exit 1",
         "echo \"Verifying zip file...\"",
@@ -36,7 +39,7 @@
         "echo \"Current AWS configuration:\"",
         "aws configure list",
         "aws sts get-caller-identity",
-        "aws lambda publish-version --function-name demo --description \"Automated version update\" > publish-output.log 2>&1",
+        "aws lambda publish-version --function-name demo --description \"$LATEST_COMMIT_MESSAGE\" > publish-output.log 2>&1",
         "if [ $? -ne 0 ]; then echo \"Publish version failed\"; cat publish-output.log; exit 1; fi"
       ]
     }
